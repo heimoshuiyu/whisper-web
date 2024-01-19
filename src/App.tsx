@@ -19,6 +19,9 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
     form.append('response_format', selectResponseFormat)
     const resp = await fetch('https://yongyuancv.cn/v1/audio/transcriptions', {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`
+      },
       body: form
     })
     // streaming response
