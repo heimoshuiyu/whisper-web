@@ -18,7 +18,7 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
     form.append('file', new Blob([file]), 'audio.webm')
     form.append('response_format', selectResponseFormat)
     form.append('model', 'whisper-1')
-    const resp = await fetch('https://yongyuancv.cn/v1/audio/transcriptions', {
+    const resp = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${key}`
