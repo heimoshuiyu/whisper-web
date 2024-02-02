@@ -1,45 +1,49 @@
 import { useEffect, useState } from "react";
 
-
-function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }: any) {
-  const [result, setResult] = useState("")
-  const setStdout = setResult
+function App({
+  worker,
+  isWorkerReady,
+  setIsWorkerReady,
+  ffmpeg_worker_js_path,
+}: any) {
+  const [result, setResult] = useState("");
+  const setStdout = setResult;
   const [file, setFile] = useState<File | null>(null);
-  const [selectResponseFormat, setSelectResponseFormat] = useState("text")
+  const [selectResponseFormat, setSelectResponseFormat] = useState("text");
   const [isRunning, setIsRunning] = useState(false);
-  const [apiEndpoint, setApiEndpoint] = useState("https://yongyuancv.cn/v1/audio/transcriptions")
-  const [key, setKey] = useState("OpenAI Auth Key (if needed)")
-
+  const [apiEndpoint, setApiEndpoint] = useState(
+    "https://yongyuancv.cn/v1/audio/transcriptions",
+  );
+  const [key, setKey] = useState("OpenAI Auth Key (if needed)");
 
   const transcribe = async (file: any) => {
-    setStdout("Uploading to API...")
-    setIsRunning(true)
-    const form = new FormData()
-    form.append('file', new Blob([file]), 'audio.webm')
-    form.append('response_format', selectResponseFormat)
-    form.append('model', 'whisper-1')
+    setStdout("Uploading to API...");
+    setIsRunning(true);
+    const form = new FormData();
+    form.append("file", new Blob([file]), "audio.webm");
+    form.append("response_format", selectResponseFormat);
+    form.append("model", "whisper-1");
     const resp = await fetch(apiEndpoint, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${key}`
+        Authorization: `Bearer ${key}`,
       },
-      body: form
-    })
+      body: form,
+    });
     // streaming response
-    let result = ''
-    const reader = resp.body!.pipeThrough(new TextDecoderStream()).getReader()
+    let result = "";
+    const reader = resp.body!.pipeThrough(new TextDecoderStream()).getReader();
     while (true) {
-      const { done, value } = await reader.read()
+      const { done, value } = await reader.read();
       if (done) {
-        setIsRunning(false)
-        break
+        setIsRunning(false);
+        break;
       }
-      result = result + value
-      setResult(result)
+      result = result + value;
+      setResult(result);
     }
-    setIsRunning(false)
-
-  }
+    setIsRunning(false);
+  };
   if (worker !== null) {
     worker.onmessage = function (e: any) {
       const msg = e.data;
@@ -57,18 +61,18 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
         case "done":
           console.log("done", msg);
           if (msg.data.MEMFS.length === 0) {
-            setStdout('Error: please check F12 console')
-            setIsRunning(false)
-            break
+            setStdout("Error: please check F12 console");
+            setIsRunning(false);
+            break;
           }
 
-          transcribe(msg.data.MEMFS[0].data)
+          transcribe(msg.data.MEMFS[0].data);
           break;
       }
-    }
+    };
   }
 
-  const [showSettings, setShowSettings] = useState(false)
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <div className="relative">
@@ -76,11 +80,24 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
       <p className="mb-2">Transcribe your media</p>
 
       <p className="mb-4">
-        FFmpeg worker status: {isWorkerReady ? <span className="text-green-500">Ready</span> : <span className="text-red-500">Loading from {ffmpeg_worker_js_path}</span>}
+        FFmpeg worker status:{" "}
+        {isWorkerReady ? (
+          <span className="text-green-500">Ready</span>
+        ) : (
+          <span className="text-red-500">
+            Loading from {ffmpeg_worker_js_path}
+          </span>
+        )}
       </p>
 
-      <button className="absolute top-0 right-0" onClick={() => setShowSettings(!showSettings)}>
-        <img className="w-10 my-2 p-2 border rounded shadow bg-gray-200" src="settings.svg" />
+      <button
+        className="absolute top-0 right-0"
+        onClick={() => setShowSettings(!showSettings)}
+      >
+        <img
+          className="w-10 my-2 p-2 border rounded shadow bg-gray-200"
+          src="settings.svg"
+        />
       </button>
 
       {showSettings && (
@@ -88,18 +105,32 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
           <span className="my-4">
             <label className="my-4 block text-gray-700 text-sm font-bold mb-2">
               API endpoint:
-              <a className="ml-2 text-blue-500" href="https://github.com/heimoshuiyu/whisper-fastapi/" target="_blank">host your own whisper backend</a>
+              <a
+                className="ml-2 text-blue-500"
+                href="https://github.com/heimoshuiyu/whisper-fastapi/"
+                target="_blank"
+              >
+                host your own whisper backend
+              </a>
             </label>
             <input
               spellCheck={false}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text" value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} />
+              type="text"
+              value={apiEndpoint}
+              onChange={(e) => setApiEndpoint(e.target.value)}
+            />
           </span>
           <span className="my-4">
-            <label className="my-4 block text-gray-700 text-sm font-bold mb-2">API key:</label>
+            <label className="my-4 block text-gray-700 text-sm font-bold mb-2">
+              API key:
+            </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text" value={key} onChange={(e) => setKey(e.target.value)} />
+              type="text"
+              value={key}
+              onChange={(e) => setKey(e.target.value)}
+            />
           </span>
           <span className="my-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -122,7 +153,9 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
       )}
 
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Select file:</label>
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Select file:
+        </label>
         <input
           id="file_input"
           type="file"
@@ -145,12 +178,12 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
             if (!file) {
               return;
             }
-            setResult("")
+            setResult("");
             console.log("file is", file);
             let fileData = await file.arrayBuffer();
             const outputFile = file.name + ".webm";
 
-            setStdout("Compiling ffmpeg.js...")
+            setStdout("Compiling ffmpeg.js...");
             setIsRunning(true);
 
             // read file data
@@ -188,8 +221,7 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
               return;
             }
             navigator.clipboard.writeText(result);
-            alert(`Copied ${result.length} characters to clipboard`)
-
+            alert(`Copied ${result.length} characters to clipboard`);
           }}
         >
           Copy output to clipboard
@@ -201,49 +233,51 @@ function App({ worker, isWorkerReady, setIsWorkerReady, ffmpeg_worker_js_path }:
           <div className="rounded h-2 bg-blue-200 overflow-hidden">
             <div
               id="progressbar"
-              className="rounded overflow-hidden h-full bg-gradient-to-r from-blue-200 via-blue-500 to-blue-200" >
-            </div>
+              className="rounded overflow-hidden h-full bg-gradient-to-r from-blue-200 via-blue-500 to-blue-200"
+            ></div>
           </div>
         </div>
       )}
-
-
 
       <div className="mt-6">
         <p className=" max-h-64 overflow-scroll whitespace-pre-wrap bg-gray-100 p-4 rounded border border-gray-300">
           {result}
         </p>
-
       </div>
     </div>
   );
 }
 
 function Root() {
-  const ffmpeg_worker_js_path = "https://cdn.jsdelivr.net/npm/ffmpeg.js@4.2.9003/ffmpeg-worker-webm.js"
-  const [worker, setWorker] = useState<any>(null)
+  const ffmpeg_worker_js_path =
+    "https://cdn.jsdelivr.net/npm/ffmpeg.js@4.2.9003/ffmpeg-worker-webm.js";
+  const [worker, setWorker] = useState<any>(null);
   const loadWorker = async () => {
-    const jsContent = await fetch(ffmpeg_worker_js_path).then((res) => res.text())
-    const blob = new Blob([jsContent], { type: "application/javascript" })
+    const jsContent = await fetch(ffmpeg_worker_js_path).then((res) =>
+      res.text(),
+    );
+    const blob = new Blob([jsContent], { type: "application/javascript" });
     setWorker(new Worker(window.URL.createObjectURL(blob)));
-  }
+  };
   useEffect(() => {
-    loadWorker()
-  }, [])
+    loadWorker();
+  }, []);
   const [isWorkerReady, setIsWorkerReady] = useState(false);
 
-  console.log('worker created')
+  console.log("worker created");
 
-  return <div className="container mx-auto p-8">
-    <div className="bg-white rounded shadow-lg p-6">
-      <App
-        worker={worker}
-        ffmpeg_worker_js_path={ffmpeg_worker_js_path}
-        isWorkerReady={isWorkerReady}
-        setIsWorkerReady={setIsWorkerReady}
-      />
+  return (
+    <div className="container mx-auto p-8">
+      <div className="bg-white rounded shadow-lg p-6">
+        <App
+          worker={worker}
+          ffmpeg_worker_js_path={ffmpeg_worker_js_path}
+          isWorkerReady={isWorkerReady}
+          setIsWorkerReady={setIsWorkerReady}
+        />
+      </div>
     </div>
-  </div>
+  );
 }
 
 export default Root;
