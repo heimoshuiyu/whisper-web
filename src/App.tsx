@@ -12,9 +12,11 @@ function App({
   const [selectResponseFormat, setSelectResponseFormat] = useState("text");
   const [isRunning, setIsRunning] = useState(false);
   const [apiEndpoint, setApiEndpoint] = useState(
-    "https://yongyuancv.cn/v1/audio/transcriptions",
+    "https://yongyuancv.cn/v1/audio/transcriptions"
   );
   const [key, setKey] = useState("OpenAI Auth Key (if needed)");
+  const [language, setLanguage] = useState("");
+  const [useFFmpeg, setUseFFmpeg] = useState(true);
 
   const transcribe = async (file: any) => {
     setStdout("Uploading to API...");
@@ -23,6 +25,9 @@ function App({
     form.append("file", new Blob([file]), "audio.webm");
     form.append("response_format", selectResponseFormat);
     form.append("model", "whisper-1");
+    if (language) {
+      form.append("language", language);
+    }
     const resp = await fetch(apiEndpoint, {
       method: "POST",
       headers: {
@@ -106,11 +111,11 @@ function App({
             <label className="my-4 block text-gray-700 text-sm font-bold mb-2">
               API endpoint:
               <a
-                className="ml-2 text-blue-500"
+                className="ml-2 text-blue-500 underline"
                 href="https://github.com/heimoshuiyu/whisper-fastapi/"
                 target="_blank"
               >
-                host your own whisper backend
+                How to host your own whisper backend
               </a>
             </label>
             <input
@@ -149,6 +154,27 @@ function App({
               <option value="json">JSON</option>
             </select>
           </span>
+          <span className="my-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Language: (leave blank for auto-detect)
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            />
+          </span>
+          <span className="my-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Use FFmpeg.js:
+            </label>
+            <input
+              type="checkbox"
+              checked={useFFmpeg}
+              onChange={(e) => setUseFFmpeg(e.target.checked)}
+            />
+          </span>
         </div>
       )}
 
@@ -172,12 +198,18 @@ function App({
       <div className="mt-6 flex justify-between space-x-4">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!isWorkerReady || !file || isRunning}
+          disabled={useFFmpeg && (!isWorkerReady || !file || isRunning)}
           onClick={async () => {
-            // run with MEMFS
             if (!file) {
               return;
             }
+
+            // skip ffmpeg
+            if (!useFFmpeg) {
+              await transcribe(file);
+              return
+            }
+
             setResult("");
             console.log("file is", file);
             let fileData = await file.arrayBuffer();
@@ -254,7 +286,7 @@ function Root() {
   const [worker, setWorker] = useState<any>(null);
   const loadWorker = async () => {
     const jsContent = await fetch(ffmpeg_worker_js_path).then((res) =>
-      res.text(),
+      res.text()
     );
     const blob = new Blob([jsContent], { type: "application/javascript" });
     setWorker(new Worker(window.URL.createObjectURL(blob)));
