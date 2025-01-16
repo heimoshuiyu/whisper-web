@@ -12,7 +12,7 @@ function App({
   const [selectResponseFormat, setSelectResponseFormat] = useState("text");
   const [isRunning, setIsRunning] = useState(false);
   const [apiEndpoint, setApiEndpoint] = useState(
-    "https://yongyuancv.cn/v1/audio/transcriptions"
+    "https://yongyuancv.cn/v1/audio/transcriptions",
   );
   const [key, setKey] = useState("OpenAI Auth Key (if needed)");
   const [language, setLanguage] = useState("");
@@ -104,6 +104,25 @@ function App({
           src="settings.svg"
         />
       </button>
+      <div className="my-4 settings">
+        <span className="my-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Response format:
+          </label>
+          <select
+            id="response_format"
+            className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+            value={selectResponseFormat}
+            onChange={(e) => setSelectResponseFormat(e.target.value)}
+          >
+            <option value="text">Text</option>
+            <option value="srt">SRT</option>
+            <option value="vtt">VTT</option>
+            <option value="stream">stream</option>
+            <option value="json">JSON</option>
+          </select>
+        </span>
+      </div>
 
       {showSettings && (
         <div className="my-4 settings">
@@ -136,23 +155,6 @@ function App({
               value={key}
               onChange={(e) => setKey(e.target.value)}
             />
-          </span>
-          <span className="my-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Response format:
-            </label>
-            <select
-              id="response_format"
-              className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-              value={selectResponseFormat}
-              onChange={(e) => setSelectResponseFormat(e.target.value)}
-            >
-              <option value="text">Text</option>
-              <option value="srt">SRT</option>
-              <option value="vtt">VTT</option>
-              <option value="stream">stream</option>
-              <option value="json">JSON</option>
-            </select>
           </span>
           <span className="my-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -207,7 +209,7 @@ function App({
             // skip ffmpeg
             if (!useFFmpeg) {
               await transcribe(file);
-              return
+              return;
             }
 
             setResult("");
@@ -286,7 +288,7 @@ function Root() {
   const [worker, setWorker] = useState<any>(null);
   const loadWorker = async () => {
     const jsContent = await fetch(ffmpeg_worker_js_path).then((res) =>
-      res.text()
+      res.text(),
     );
     const blob = new Blob([jsContent], { type: "application/javascript" });
     setWorker(new Worker(window.URL.createObjectURL(blob)));
