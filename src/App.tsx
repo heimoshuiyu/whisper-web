@@ -181,8 +181,7 @@ function App({
 
   const translateChunk = async (
     text: string,
-    lang: string,
-    keep: boolean
+    lang: string
   ): Promise<string> => {
     const response = await fetch(llmAPIEndpoint, {
       method: "POST",
@@ -210,39 +209,6 @@ function App({
     return data.choices[0].message.content;
   };
 
-  const translateSrt = async (srt: string, lang: string, keep: boolean) => {
-    const chunks = parseSrt(srt);
-    const batchSize = 5;
-    const totalBatches = Math.ceil(chunks.length / batchSize);
-
-    setTranslationProgress(0);
-
-    const translatedChunks: SrtChunk[] = [];
-
-    for (let i = 0; i < chunks.length; i += batchSize) {
-      const batch = chunks.slice(i, i + batchSize);
-      const batchText = batch.map((c) => c.text).join("\n\n");
-
-      const translated = await translateChunk(batchText, lang, keep);
-      const translatedLines = translated.split("\n\n");
-
-      batch.forEach((chunk, index) => {
-        translatedChunks.push({
-          ...chunk,
-          text: keep
-            ? `${chunk.text}\n${translatedLines[index]}`
-            : translatedLines[index],
-        });
-      });
-
-      setTranslationProgress(
-        Math.min(Math.round(((i + batchSize) / chunks.length) * 100), 100)
-      );
-    }
-
-    return buildSrt(translatedChunks);
-  };
-
   const translateSrtParallel = async (
     srt: string,
     lang: string,
@@ -262,7 +228,7 @@ function App({
       batches.map(async (batch, index) => {
         try {
           const batchText = batch.map((c) => c.text).join("\n\n");
-          const translated = await translateChunk(batchText, lang, keep);
+          const translated = await translateChunk(batchText, lang);
           completed += batch.length;
           setTranslationProgress(Math.round((completed / chunks.length) * 100));
           return { index, translated };
