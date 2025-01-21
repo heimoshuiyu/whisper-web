@@ -6,17 +6,91 @@ function App({
   setIsWorkerReady,
   ffmpeg_worker_js_path,
 }: any) {
+  const loadStringFromLocalStorageWithDefault = (
+    key: string,
+    defaultValue: string
+  ) => {
+    const value = window.localStorage.getItem(key);
+    return value === null ? defaultValue : value;
+  };
+
+  const mockStringStateUpdater = (key: string, setKey: any) => (e: string) => {
+    window.localStorage.setItem(key, e);
+    setKey(e);
+  };
+
   const [result, setResult] = useState("");
+  const [translatedResult, setTranslatedResult] = useState("");
   const setStdout = setResult;
   const [file, setFile] = useState<File | null>(null);
-  const [selectResponseFormat, setSelectResponseFormat] = useState("text");
-  const [isRunning, setIsRunning] = useState(false);
-  const [apiEndpoint, setApiEndpoint] = useState(
-    "https://yongyuancv.cn/v1/audio/transcriptions",
+
+  const [selectResponseFormat, _setSelectResponseFormat] = useState(
+    loadStringFromLocalStorageWithDefault("response_format", "text")
   );
-  const [key, setKey] = useState("OpenAI Auth Key (if needed)");
-  const [language, setLanguage] = useState("");
+  const setSelectResponseFormat = mockStringStateUpdater(
+    "response_format",
+    _setSelectResponseFormat
+  );
+
+  const [isRunning, setIsRunning] = useState(false);
+
+  const [apiEndpoint, _setApiEndpoint] = useState(
+    loadStringFromLocalStorageWithDefault(
+      "api_endpoint",
+      "https://yongyuancv.cn/v1/audio/transcriptions"
+    )
+  );
+  const setApiEndpoint = mockStringStateUpdater(
+    "api_endpoint",
+    _setApiEndpoint
+  );
+
+  const [llmAPIEndpoint, _setLlmAPIEndpoint] = useState(
+    loadStringFromLocalStorageWithDefault(
+      "llm_api_endpoint",
+      "https://api.openai.com/v1/chat/completions"
+    )
+  );
+  const setLlmAPIEndpoint = mockStringStateUpdater(
+    "llm_api_endpoint",
+    _setLlmAPIEndpoint
+  );
+
+  const [llmModel, _setLlmModel] = useState(
+    loadStringFromLocalStorageWithDefault("llm_model", "gpt-4o-mini")
+  );
+  const setLlmModel = mockStringStateUpdater("llm_model", _setLlmModel);
+
+  const [llmKey, _setLlmKey] = useState(
+    loadStringFromLocalStorageWithDefault(
+      "llm_key",
+      "OpenAI Auth Key (if needed)"
+    )
+  );
+  const setLlmKey = mockStringStateUpdater("llm_key", _setLlmKey);
+
+  const [key, _setKey] = useState(
+    loadStringFromLocalStorageWithDefault("api_key", "API Key (if needed)")
+  );
+  const setKey = mockStringStateUpdater("api_key", _setKey);
+
+  const [language, _setLanguage] = useState(
+    loadStringFromLocalStorageWithDefault("language", "")
+  );
+  const setLanguage = mockStringStateUpdater("language", _setLanguage);
+
   const [useFFmpeg, setUseFFmpeg] = useState(true);
+
+  const [targetLanguage, _setTargetLanguage] = useState(
+    loadStringFromLocalStorageWithDefault("target_language", "English")
+  );
+  const setTargetLanguage = mockStringStateUpdater(
+    "target_language",
+    _setTargetLanguage
+  );
+
+  const [keepOriginal, setKeepOriginal] = useState(true);
+  const [translationProgress, setTranslationProgress] = useState(0);
 
   const transcribe = async (file: any) => {
     setStdout("Uploading to API...");
@@ -78,6 +152,140 @@ function App({
   }
 
   const [showSettings, setShowSettings] = useState(false);
+
+  interface SrtChunk {
+    number: string;
+    time: string;
+    text: string;
+  }
+
+  const parseSrt = (srt: string): SrtChunk[] => {
+    return srt
+      .split("\n\n")
+      .filter((chunk) => chunk.trim())
+      .map((chunk) => {
+        const lines = chunk.split("\n");
+        return {
+          number: lines[0],
+          time: lines[1],
+          text: lines.slice(2).join("\n"),
+        };
+      });
+  };
+
+  const buildSrt = (chunks: SrtChunk[]): string => {
+    return chunks
+      .map((chunk) => `${chunk.number}\n${chunk.time}\n${chunk.text}\n`)
+      .join("\n");
+  };
+
+  const translateChunk = async (
+    text: string,
+    lang: string,
+    keep: boolean
+  ): Promise<string> => {
+    const response = await fetch(llmAPIEndpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${llmKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: llmModel,
+        temperature: 0,
+        messages: [
+          {
+            role: "system",
+            content: `Transcribe the following subtitle text line by line into ${lang}. Ensure that each translated line is corresponds exactly to the original line number`,
+          },
+          {
+            role: "user",
+            content: text,
+          },
+        ],
+      }),
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  };
+
+  const translateSrt = async (srt: string, lang: string, keep: boolean) => {
+    const chunks = parseSrt(srt);
+    const batchSize = 5;
+    const totalBatches = Math.ceil(chunks.length / batchSize);
+
+    setTranslationProgress(0);
+
+    const translatedChunks: SrtChunk[] = [];
+
+    for (let i = 0; i < chunks.length; i += batchSize) {
+      const batch = chunks.slice(i, i + batchSize);
+      const batchText = batch.map((c) => c.text).join("\n\n");
+
+      const translated = await translateChunk(batchText, lang, keep);
+      const translatedLines = translated.split("\n\n");
+
+      batch.forEach((chunk, index) => {
+        translatedChunks.push({
+          ...chunk,
+          text: keep
+            ? `${chunk.text}\n${translatedLines[index]}`
+            : translatedLines[index],
+        });
+      });
+
+      setTranslationProgress(
+        Math.min(Math.round(((i + batchSize) / chunks.length) * 100), 100)
+      );
+    }
+
+    return buildSrt(translatedChunks);
+  };
+
+  const translateSrtParallel = async (
+    srt: string,
+    lang: string,
+    keep: boolean
+  ) => {
+    const chunks = parseSrt(srt);
+    const batchSize = 5;
+    const batches = [];
+
+    // 创建批次
+    for (let i = 0; i < chunks.length; i += batchSize) {
+      batches.push(chunks.slice(i, i + batchSize));
+    }
+
+    let completed = 0;
+    const results = await Promise.all(
+      batches.map(async (batch, index) => {
+        try {
+          const batchText = batch.map((c) => c.text).join("\n\n");
+          const translated = await translateChunk(batchText, lang, keep);
+          completed += batch.length;
+          setTranslationProgress(Math.round((completed / chunks.length) * 100));
+          return { index, translated };
+        } catch (error) {
+          console.error("Translation failed:", error);
+          return { index, translated: "" }; // 添加错误处理
+        }
+      })
+    );
+
+    // 合并结果
+    const translatedChunks = batches.flatMap((batch, i) => {
+      const translation = results.find((r) => r.index === i)!.translated;
+      return batch.map((chunk, j) => ({
+        ...chunk,
+        text: keep
+          ? `${chunk.text}\n${translation.split("\n\n")[j] || ""}`
+          : translation.split("\n\n")[j] || "",
+      }));
+    });
+
+    return translatedChunks;
+  };
 
   return (
     <div className="relative">
@@ -273,11 +481,131 @@ function App({
         </div>
       )}
 
-      <div className="mt-6">
-        <p className=" max-h-64 overflow-scroll whitespace-pre-wrap bg-gray-100 p-4 rounded border border-gray-300">
-          {result}
-        </p>
-      </div>
+      {result && (
+        <div className="mt-6">
+          <p className=" max-h-64 overflow-scroll whitespace-pre-wrap bg-gray-100 p-4 rounded border border-gray-300">
+            {result}
+          </p>
+        </div>
+      )}
+
+      {result && selectResponseFormat === "srt" && !isRunning && (
+        <div className="mt-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Translate to language:
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            type="text"
+            value={targetLanguage}
+            onChange={(e) => setTargetLanguage(e.target.value)}
+          />
+          <span className="my-4 w-full block">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Keep original text:
+            </label>
+            <input
+              type="checkbox"
+              checked={keepOriginal}
+              onChange={(e) => setKeepOriginal(e.target.checked)}
+            />
+          </span>
+
+          <span className="my-4 w-full block">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              LLM API endpoint:
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              value={llmAPIEndpoint}
+              onChange={(e) => setLlmAPIEndpoint(e.target.value)}
+            />
+          </span>
+
+          <span className="my-4 w-full block">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              LLM API key:
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              value={llmKey}
+              onChange={(e) => setLlmKey(e.target.value)}
+            />
+          </span>
+
+          <span className="my-4 w-full block">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              LLM model:
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              value={llmModel}
+              onChange={(e) => setLlmModel(e.target.value)}
+            />
+          </span>
+
+          <div className="mt-6 flex justify-between space-x-4">
+            <button
+              className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+              onClick={async () => {
+                if (!targetLanguage) {
+                  alert("Please enter target language!");
+                  return;
+                }
+                const translated = await translateSrtParallel(
+                  result,
+                  targetLanguage,
+                  keepOriginal
+                );
+                setTranslatedResult(buildSrt(translated));
+              }}
+            >
+              Translate SRT
+            </button>
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              onClick={() => {
+                if (!result) {
+                  return;
+                }
+                if (!navigator.clipboard) {
+                  alert("Your browser does not support clipboard");
+                  return;
+                }
+                navigator.clipboard.writeText(translatedResult);
+                alert(
+                  `Copied ${translatedResult.length} characters to clipboard`
+                );
+              }}
+            >
+              Copy output to clipboard
+            </button>
+          </div>
+
+          {translationProgress > 0 && (
+            <div className="mt-2">
+              Progress: {translationProgress}%
+              <div className="h-2 bg-gray-200 rounded">
+                <div
+                  className="h-full bg-purple-500 rounded"
+                  style={{ width: `${translationProgress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {translatedResult && (
+        <div className="mt-6">
+          <p className=" max-h-64 overflow-scroll whitespace-pre-wrap bg-gray-100 p-4 rounded border border-gray-300">
+            {translatedResult}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -288,7 +616,7 @@ function Root() {
   const [worker, setWorker] = useState<any>(null);
   const loadWorker = async () => {
     const jsContent = await fetch(ffmpeg_worker_js_path).then((res) =>
-      res.text(),
+      res.text()
     );
     const blob = new Blob([jsContent], { type: "application/javascript" });
     setWorker(new Worker(window.URL.createObjectURL(blob)));
