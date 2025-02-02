@@ -37,7 +37,7 @@ function App({
   const [apiEndpoint, _setApiEndpoint] = useState(
     loadStringFromLocalStorageWithDefault(
       "api_endpoint",
-      "https://a.yongyuancv.cn/v1/audio/transcriptions"
+      "https://yongyuancv.cn/v1/audio/transcriptions"
     )
   );
   const setApiEndpoint = mockStringStateUpdater(
