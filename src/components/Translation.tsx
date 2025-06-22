@@ -1,6 +1,7 @@
 import { TranslationProps } from "../types";
 import { translateSrtParallel } from "../services/translation";
-import { buildSrt } from "../utils/helpers";
+import { buildSrt, getSampleTextFromSrt } from "../utils/helpers";
+import LLMPromptPreview from "./LLMPromptPreview";
 
 const Translation: React.FC<TranslationProps> = ({
   result,
@@ -34,6 +35,9 @@ const Translation: React.FC<TranslationProps> = ({
   };
 
   const disabledReason = getDisabledReason();
+
+  // Get sample text for prompt preview
+  const sampleText = getSampleTextFromSrt(result);
 
   const handleTranslate = async () => {
     if (!canTranslate) return;
@@ -156,6 +160,14 @@ const Translation: React.FC<TranslationProps> = ({
             />
           </div>
         </div>
+
+        {/* LLM Prompt Preview */}
+        <LLMPromptPreview
+          targetLanguage={targetLanguage}
+          sampleText={sampleText}
+          llmModel={llmModel}
+          isVisible={Boolean(canTranslate && targetLanguage)}
+        />
 
         <div className="flex justify-between space-x-4">
           <button

@@ -33,3 +33,24 @@ export const buildSrt = (chunks: SrtChunk[]): string => {
     .map((chunk) => `${chunk.number}\n${chunk.time}\n${chunk.text}\n`)
     .join("\n");
 };
+
+export const getSampleTextFromSrt = (
+  srt: string,
+  maxChunks: number = 3,
+): string => {
+  if (!srt) return "";
+
+  try {
+    const chunks = parseSrt(srt);
+    const sampleChunks = chunks.slice(0, maxChunks);
+
+    if (sampleChunks.length === 0) return "";
+
+    return sampleChunks
+      .map((chunk) => `${chunk.number}: ${chunk.text}`)
+      .join("\n");
+  } catch (error) {
+    console.error("Error parsing SRT for sample text:", error);
+    return "";
+  }
+};
