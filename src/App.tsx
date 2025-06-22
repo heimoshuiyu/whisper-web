@@ -29,7 +29,7 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
   // Local storage hooks
   const [selectResponseFormat, setSelectResponseFormat] = useLocalStorage(
     "response_format",
-    "text",
+    "srt",
   );
   const [apiEndpoint, setApiEndpoint] = useLocalStorage(
     "api_endpoint",
