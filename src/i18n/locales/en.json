@@ -1,0 +1,136 @@
+{
+  "app": {
+    "title": "Whisper Web",
+    "subtitle": "Transcribe and translate your media files with AI-powered accuracy",
+    "description": "Upload any media format, get high-quality transcriptions, and optionally translate to your preferred language"
+  },
+  "ffmpeg": {
+    "status": "FFmpeg status:",
+    "ready": "Ready",
+    "loading": "Loading ffmpeg.wasm...",
+    "notAvailable": "Not Available (SharedArrayBuffer not supported)"
+  },
+  "settings": {
+    "title": "Settings",
+    "apiKey": "API Key (if needed)",
+    "apiEndpoint": "API Endpoint",
+    "llmApiKey": "OpenAI Auth Key (if needed)",
+    "llmApiEndpoint": "LLM API Endpoint",
+    "llmModel": "LLM Model",
+    "language": "Language: (leave blank for auto-detect)",
+    "responseFormat": "Response Format",
+    "useFFmpeg": "Use FFmpeg:"
+  },
+  "translation": {
+    "title": "Translation",
+    "targetLanguage": "Translate to language:",
+    "keepOriginal": "Keep original text alongside translation",
+    "translate": "Translate",
+    "copyTranslation": "Copy Translation",
+    "progress": "Translation Progress",
+    "requirements": "Translation Requirements:",
+    "srtOnly": "Translation only works with SRT format (current: {{format}})",
+    "enterLanguage": "Please enter target language!",
+    "keepOriginalLabel": "Keep original text:"
+  },
+  "fileUpload": {
+    "title": "File Upload",
+    "dragDrop": "Drag and drop a file here, or click to select",
+    "selectFile": "Select file"
+  },
+  "actionButtons": {
+    "transcribe": "Transcribe",
+    "clear": "Clear",
+    "download": "Download",
+    "copyOutput": "Copy output to clipboard"
+  },
+  "workflow": {
+    "title": "How Whisper Web Works",
+    "steps": {
+      "upload": "Media File Upload",
+      "ffmpeg": "FFmpeg (WASM)",
+      "api": "Upload to API",
+      "transcription": "Transcription",
+      "translation": "LLM Translation",
+      "result": "Text/Translation"
+    },
+    "flowchart": {
+      "audioCompression": "Audio Compression",
+      "openaiWhisper": "OpenAI Whisper",
+      "textOutput": "Text Output",
+      "srtFormat": "SRT Format?",
+      "yes": "Yes",
+      "no": "No",
+      "batchProcessing": "Batch Processing",
+      "finalResult": "Final Result"
+    },
+    "keyFeatures": "Key Features",
+    "features": {
+      "format": "Supports any media format that FFmpeg can process",
+      "compression": "Local audio compression using FFmpeg WebAssembly",
+      "transcription": "Secure transcription via OpenAI Whisper API",
+      "translation": "Batch translation for SRT subtitles with context awareness"
+    },
+    "benefits": "Benefits",
+    "benefitItems": {
+      "noServer": "No server-side processing required",
+      "privacy": "Privacy-focused: audio processing happens locally",
+      "quality": "High-quality transcription with multiple output formats",
+      "intelligent": "Intelligent translation with subtitle context preservation"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close"
+  },
+  "llmPreview": {
+    "title": "LLM Prompt Preview",
+    "systemMessage": "System Message",
+    "userMessage": "User Message",
+    "requestStructure": "Full Request Structure",
+    "note": "Note: This preview shows the prompt structure that will be sent to the LLM API. The actual text content will be the SRT subtitles from your transcription."
+  },
+  "downloadProgress": {
+    "ffmpegError": "FFmpeg Error",
+    "sharedArrayBufferNotSupported": "SharedArrayBuffer is not supported in this environment.",
+    "typicalIssue": "This typically happens when deploying to GitHub Pages or other static hosting services that don't support the required CORS headers.",
+    "solutions": "Solutions",
+    "solution1": "Use the app locally (run npm run dev)",
+    "solution2": "Deploy to a service that supports CORS headers (Vercel, Netlify, etc.)",
+    "solution3": "Use a custom domain with proper CORS configuration",
+    "solution4": "Disable FFmpeg processing in settings and upload pre-converted audio files",
+    "note": "Note",
+    "noteText": "You can still use the app without FFmpeg by uploading audio files that are already in a compatible format (MP3, WAV, etc.).",
+    "downloading": "Downloading {{fileName}}...",
+    "downloaded": "downloaded",
+    "fileSizeUnknown": "File size unknown - showing estimated progress"
+  },
+  "modal": {
+    "whisperFastApi": {
+      "title": "Whisper-FastAPI Project",
+      "description": "You can host your own Whisper backend using the open-source whisper-fastapi project.",
+      "viewProject": "View Project on GitHub"
+    },
+    "contact": {
+      "title": "Contact Information",
+      "description": "If you need more stable API service or help setting up a local API backend, feel free to contact me:"
+    },
+    "services": {
+      "title": "Services Offered",
+      "items": {
+        "api": "Stable and fast API service",
+        "setup": "Help with local backend setup",
+        "deployment": "Custom Whisper model deployment",
+        "consultation": "Technical consultation and support"
+      }
+    }
+  },
+  "footer": {
+    "openSource": "This is an open-source project. View the source code on",
+    "github": "GitHub"
+  }
+}

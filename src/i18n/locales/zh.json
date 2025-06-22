@@ -1,0 +1,136 @@
+{
+  "app": {
+    "title": "Whisper Web",
+    "subtitle": "使用Whisper API 转录音频，使用大语言模型翻译字幕",
+    "description": "上传任何媒体格式，获得高质量转录，并可选择翻译为其他语言"
+  },
+  "ffmpeg": {
+    "status": "FFmpeg 状态：",
+    "ready": "就绪",
+    "loading": "正在加载 ffmpeg.wasm...",
+    "notAvailable": "不可用（不支持 SharedArrayBuffer）"
+  },
+  "settings": {
+    "title": "设置",
+    "apiKey": "API 密钥（如需要）",
+    "apiEndpoint": "API 端点",
+    "llmApiKey": "OpenAI 认证密钥（如需要）",
+    "llmApiEndpoint": "LLM API 端点",
+    "llmModel": "LLM 模型",
+    "language": "语言：（留空为自动检测）",
+    "responseFormat": "响应格式",
+    "useFFmpeg": "使用 FFmpeg："
+  },
+  "translation": {
+    "title": "翻译",
+    "targetLanguage": "翻译目标语言：",
+    "keepOriginal": "保留原文与翻译",
+    "translate": "翻译",
+    "copyTranslation": "复制翻译",
+    "progress": "翻译进度",
+    "requirements": "翻译要求：",
+    "srtOnly": "翻译仅适用于 SRT 格式（当前：{{format}}）",
+    "enterLanguage": "请输入目标语言！",
+    "keepOriginalLabel": "保留原文："
+  },
+  "fileUpload": {
+    "title": "文件上传",
+    "dragDrop": "拖拽文件到此处，或点击选择",
+    "selectFile": "选择文件"
+  },
+  "actionButtons": {
+    "transcribe": "转录",
+    "clear": "清除",
+    "download": "下载",
+    "copyOutput": "复制输出到剪贴板"
+  },
+  "workflow": {
+    "title": "Whisper Web 工作原理",
+    "steps": {
+      "upload": "媒体文件上传",
+      "ffmpeg": "FFmpeg (WASM)",
+      "api": "上传到 API",
+      "transcription": "转录",
+      "translation": "LLM 翻译",
+      "result": "文本/翻译"
+    },
+    "flowchart": {
+      "audioCompression": "音频压缩",
+      "openaiWhisper": "OpenAI Whisper",
+      "textOutput": "文本输出",
+      "srtFormat": "SRT 格式？",
+      "yes": "是",
+      "no": "否",
+      "batchProcessing": "批量处理",
+      "finalResult": "最终结果"
+    },
+    "keyFeatures": "主要特性",
+    "features": {
+      "format": "支持 FFmpeg 可处理的任何媒体格式",
+      "compression": "使用 FFmpeg WebAssembly 进行本地音频压缩",
+      "transcription": "通过 OpenAI Whisper API 进行安全转录",
+      "translation": "SRT 字幕的批量翻译，具有上下文感知"
+    },
+    "benefits": "优势",
+    "benefitItems": {
+      "noServer": "无需服务器端处理",
+      "privacy": "注重隐私：音频处理在本地进行",
+      "quality": "高质量转录，支持多种输出格式",
+      "intelligent": "智能翻译，保持字幕上下文"
+    }
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "close": "关闭"
+  },
+  "llmPreview": {
+    "title": "LLM 提示预览",
+    "systemMessage": "系统消息",
+    "userMessage": "用户消息",
+    "requestStructure": "完整请求结构",
+    "note": "注意：此预览显示将发送到 LLM API 的提示结构。实际文本内容将是您转录的 SRT 字幕。"
+  },
+  "downloadProgress": {
+    "ffmpegError": "FFmpeg 错误",
+    "sharedArrayBufferNotSupported": "此环境不支持 SharedArrayBuffer。",
+    "typicalIssue": "这通常发生在部署到 GitHub Pages 或其他不支持所需 CORS 头的静态托管服务时。",
+    "solutions": "解决方案",
+    "solution1": "在本地使用应用（运行 npm run dev）",
+    "solution2": "部署到支持 CORS 头的服务（Vercel、Netlify 等）",
+    "solution3": "使用具有正确 CORS 配置的自定义域名",
+    "solution4": "在设置中禁用 FFmpeg 处理并上传预转换的音频文件",
+    "note": "注意",
+    "noteText": "您仍然可以在没有 FFmpeg 的情况下使用应用，只需上传已经是兼容格式的音频文件（MP3、WAV 等）。",
+    "downloading": "正在下载 {{fileName}}...",
+    "downloaded": "已下载",
+    "fileSizeUnknown": "文件大小未知 - 显示估计进度"
+  },
+  "modal": {
+    "whisperFastApi": {
+      "title": "Whisper-FastAPI 项目",
+      "description": "您可以使用开源的 whisper-fastapi 项目托管自己的 Whisper 后端。",
+      "viewProject": "在 GitHub 上查看项目"
+    },
+    "contact": {
+      "title": "联系信息",
+      "description": "如果您需要更稳定的 API 服务或帮助设置本地 API 后端，请随时联系我："
+    },
+    "services": {
+      "title": "提供的服务",
+      "items": {
+        "api": "稳定快速的 API 服务",
+        "setup": "帮助设置本地后端",
+        "deployment": "自定义 Whisper 模型部署",
+        "consultation": "技术咨询和支持"
+      }
+    }
+  },
+  "footer": {
+    "openSource": "这是一个开源项目。",
+    "github": "GitHub"
+  }
+}

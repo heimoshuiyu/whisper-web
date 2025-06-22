@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface WorkflowFlowchartProps {
   isVisible?: boolean;
@@ -7,12 +8,14 @@ interface WorkflowFlowchartProps {
 const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
   isVisible = true,
 }) => {
+  const { t } = useTranslation();
+
   if (!isVisible) return null;
 
   return (
     <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 transition-all duration-300 ease-in-out">
       <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-        How Whisper Web Works
+        {t("workflow.title")}
       </h2>
 
       <div className="flex justify-center overflow-x-auto">
@@ -45,7 +48,7 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="12"
             fontWeight="bold"
           >
-            Media File Upload
+            {t("workflow.steps.upload")}
           </text>
           <text x="110" y="100" textAnchor="middle" fill="white" fontSize="10">
             (Any FFmpeg format)
@@ -78,10 +81,10 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="12"
             fontWeight="bold"
           >
-            FFmpeg (WASM)
+            {t("workflow.steps.ffmpeg")}
           </text>
           <text x="280" y="100" textAnchor="middle" fill="white" fontSize="10">
-            Audio Compression
+            {t("workflow.flowchart.audioCompression")}
           </text>
 
           {/* Arrow 2 */}
@@ -111,10 +114,10 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="12"
             fontWeight="bold"
           >
-            Upload to API
+            {t("workflow.steps.api")}
           </text>
           <text x="450" y="100" textAnchor="middle" fill="white" fontSize="10">
-            OpenAI Whisper
+            {t("workflow.flowchart.openaiWhisper")}
           </text>
 
           {/* Arrow 3 */}
@@ -144,10 +147,10 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="12"
             fontWeight="bold"
           >
-            Transcription
+            {t("workflow.steps.transcription")}
           </text>
           <text x="620" y="100" textAnchor="middle" fill="white" fontSize="10">
-            Text Output
+            {t("workflow.flowchart.textOutput")}
           </text>
 
           {/* Conditional path for SRT format */}
@@ -173,7 +176,7 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="11"
             fontWeight="bold"
           >
-            SRT Format?
+            {t("workflow.flowchart.srtFormat")}
           </text>
 
           {/* Yes path */}
@@ -191,7 +194,7 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="10"
             fontWeight="bold"
           >
-            Yes
+            {t("workflow.flowchart.yes")}
           </text>
 
           {/* Translation step */}
@@ -213,10 +216,10 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="12"
             fontWeight="bold"
           >
-            LLM Translation
+            {t("workflow.steps.translation")}
           </text>
           <text x="760" y="200" textAnchor="middle" fill="white" fontSize="10">
-            Batch Processing
+            {t("workflow.flowchart.batchProcessing")}
           </text>
 
           {/* No path */}
@@ -234,7 +237,7 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="10"
             fontWeight="bold"
           >
-            No
+            {t("workflow.flowchart.no")}
           </text>
 
           {/* Final result */}
@@ -256,10 +259,10 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
             fontSize="12"
             fontWeight="bold"
           >
-            Final Result
+            {t("workflow.flowchart.finalResult")}
           </text>
           <text x="620" y="350" textAnchor="middle" fill="white" fontSize="10">
-            Text/Translation
+            {t("workflow.steps.result")}
           </text>
 
           {/* Arrow from translation to final result */}
@@ -288,21 +291,25 @@ const WorkflowFlowchart: React.FC<WorkflowFlowchartProps> = ({
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
         <div className="space-y-2">
-          <h3 className="font-semibold text-gray-800">Key Features:</h3>
+          <h3 className="font-semibold text-gray-800">
+            {t("workflow.keyFeatures")}:
+          </h3>
           <ul className="list-disc list-inside space-y-1 ml-4">
-            <li>Supports any media format that FFmpeg can process</li>
-            <li>Local audio compression using FFmpeg WebAssembly</li>
-            <li>Secure transcription via OpenAI Whisper API</li>
-            <li>Batch translation for SRT subtitles with context awareness</li>
+            <li>{t("workflow.features.format")}</li>
+            <li>{t("workflow.features.compression")}</li>
+            <li>{t("workflow.features.transcription")}</li>
+            <li>{t("workflow.features.translation")}</li>
           </ul>
         </div>
         <div className="space-y-2">
-          <h3 className="font-semibold text-gray-800">Benefits:</h3>
+          <h3 className="font-semibold text-gray-800">
+            {t("workflow.benefits")}:
+          </h3>
           <ul className="list-disc list-inside space-y-1 ml-4">
-            <li>No server-side processing required</li>
-            <li>Privacy-focused: audio processing happens locally</li>
-            <li>High-quality transcription with multiple output formats</li>
-            <li>Intelligent translation with subtitle context preservation</li>
+            <li>{t("workflow.benefitItems.noServer")}</li>
+            <li>{t("workflow.benefitItems.privacy")}</li>
+            <li>{t("workflow.benefitItems.quality")}</li>
+            <li>{t("workflow.benefitItems.intelligent")}</li>
           </ul>
         </div>
       </div>

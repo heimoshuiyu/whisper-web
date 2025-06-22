@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
+import { useTranslation } from "react-i18next";
 import { AppProps } from "./types";
 import { useLocalStorage } from "./hooks";
 import { toBlobURL } from "./utils/toBlobURL";
@@ -16,9 +17,11 @@ import {
   DownloadProgress,
   WorkflowFlowchart,
   Modal,
+  LanguageSwitcher,
 } from "./components";
 
 function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
+  const { t } = useTranslation();
   const [result, setResult] = useState("");
   const [translatedResult, setTranslatedResult] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -143,14 +146,11 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
 
   return (
     <div className="relative">
-      <h1 className="text-2xl font-bold mb-4">Whisper Web</h1>
-      <p className="mb-2 text-gray-600">
-        Transcribe and translate your media files with AI-powered accuracy
-      </p>
-      <p className="mb-4 text-sm text-gray-500">
-        Upload any media format, get high-quality transcriptions, and optionally
-        translate to your preferred language
-      </p>
+      <h1 className="text-2xl font-bold mb-4">{t("app.title")}</h1>
+      <p className="mb-2 text-gray-600">{t("app.subtitle")}</p>
+      <p className="mb-4 text-sm text-gray-500">{t("app.description")}</p>
+
+      <LanguageSwitcher />
 
       <button
         className="absolute top-0 right-0"
@@ -185,15 +185,13 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
       <WorkflowFlowchart isVisible={showWorkflow} />
 
       <p className="mb-4">
-        FFmpeg status:{" "}
+        {t("ffmpeg.status")}{" "}
         {isFFmpegReady ? (
-          <span className="text-green-500">Ready</span>
+          <span className="text-green-500">{t("ffmpeg.ready")}</span>
         ) : downloadProgress.error === "SharedArrayBuffer not supported" ? (
-          <span className="text-red-500">
-            Not Available (SharedArrayBuffer not supported)
-          </span>
+          <span className="text-red-500">{t("ffmpeg.notAvailable")}</span>
         ) : (
-          <span className="text-red-500">Loading ffmpeg.wasm...</span>
+          <span className="text-red-500">{t("ffmpeg.loading")}</span>
         )}
       </p>
 
@@ -265,11 +263,10 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
         <div className="space-y-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Whisper-FastAPI Project
+              {t("modal.whisperFastApi.title")}
             </h3>
             <p className="text-gray-600 mb-3">
-              You can host your own Whisper backend using the open-source
-              whisper-fastapi project.
+              {t("modal.whisperFastApi.description")}
             </p>
             <a
               href="https://github.com/heimoshuiyu/whisper-fastapi/"
@@ -277,17 +274,16 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
               rel="noopener noreferrer"
               className="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors"
             >
-              View Project on GitHub
+              {t("modal.whisperFastApi.viewProject")}
             </a>
           </div>
 
           <div className="border-t pt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Contact Information
+              {t("modal.contact.title")}
             </h3>
             <p className="text-gray-600 mb-3">
-              If you need more stable API service or help setting up a local API
-              backend, feel free to contact me:
+              {t("modal.contact.description")}
             </p>
             <div className="space-y-2">
               <a
@@ -319,13 +315,13 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
 
           <div className="border-t pt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Services Offered
+              {t("modal.services.title")}
             </h3>
             <ul className="text-gray-600 space-y-1 list-disc list-inside">
-              <li>Stable and fast API service</li>
-              <li>Help with local backend setup</li>
-              <li>Custom Whisper model deployment</li>
-              <li>Technical consultation and support</li>
+              <li>{t("modal.services.items.api")}</li>
+              <li>{t("modal.services.items.setup")}</li>
+              <li>{t("modal.services.items.deployment")}</li>
+              <li>{t("modal.services.items.consultation")}</li>
             </ul>
           </div>
         </div>
@@ -333,14 +329,14 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
 
       <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
         <p>
-          This is an open-source project. View the source code on{" "}
+          {t("footer.openSource")}{" "}
           <a
             href="https://github.com/heimoshuiyu/whisper-web/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 underline"
           >
-            GitHub
+            {t("footer.github")}
           </a>
         </p>
       </div>

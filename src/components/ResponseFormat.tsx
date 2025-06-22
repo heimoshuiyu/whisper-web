@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface ResponseFormatProps {
   selectResponseFormat: string;
   setSelectResponseFormat: (value: string) => void;
@@ -7,11 +9,13 @@ const ResponseFormat: React.FC<ResponseFormatProps> = ({
   selectResponseFormat,
   setSelectResponseFormat,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="my-4 settings">
       <span className="my-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
-          Response format:
+          {t("settings.responseFormat")}:
         </label>
         <select
           id="response_format"

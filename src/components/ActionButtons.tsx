@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface ActionButtonsProps {
   useFFmpeg: boolean;
   isFFmpegReady: boolean;
@@ -15,6 +17,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   result,
   onTranscribe,
 }) => {
+  const { t } = useTranslation();
+
   const handleCopyResult = () => {
     if (!result) {
       return;
@@ -34,14 +38,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         disabled={useFFmpeg && (!isFFmpegReady || !file || isRunning)}
         onClick={onTranscribe}
       >
-        Transcribe
+        {t("actionButtons.transcribe")}
       </button>
 
       <button
         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         onClick={handleCopyResult}
       >
-        Copy output to clipboard
+        {t("actionButtons.copyOutput")}
       </button>
     </div>
   );

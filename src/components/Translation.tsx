@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { TranslationProps } from "../types";
 import { translateSrtParallel } from "../services/translation";
 import { buildSrt, getSampleTextFromSrt } from "../utils/helpers";
@@ -22,6 +23,8 @@ const Translation: React.FC<TranslationProps> = ({
   setTranslationProgress,
   isRunning,
 }) => {
+  const { t } = useTranslation();
+
   // Determine if translation is available
   const canTranslate = result && selectResponseFormat === "srt" && !isRunning;
 
@@ -29,7 +32,7 @@ const Translation: React.FC<TranslationProps> = ({
   const getDisabledReason = () => {
     if (!result) return "No transcription result available";
     if (selectResponseFormat !== "srt")
-      return `Translation only works with SRT format (current: ${selectResponseFormat})`;
+      return t("translation.srtOnly", { format: selectResponseFormat });
     if (isRunning) return "Transcription in progress";
     return null;
   };
@@ -43,7 +46,7 @@ const Translation: React.FC<TranslationProps> = ({
     if (!canTranslate) return;
 
     if (!targetLanguage) {
-      alert("Please enter target language!");
+      alert(t("translation.enterLanguage"));
       return;
     }
     setTranslationProgress(1);
@@ -74,7 +77,9 @@ const Translation: React.FC<TranslationProps> = ({
   return (
     <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Translation</h3>
+        <h3 className="text-lg font-semibold text-gray-800">
+          {t("translation.title")}
+        </h3>
         {!canTranslate && disabledReason && (
           <div className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-md border border-amber-200">
             ⚠️ {disabledReason}
@@ -85,7 +90,7 @@ const Translation: React.FC<TranslationProps> = ({
       <div className="space-y-4">
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Translate to language:
+            {t("translation.targetLanguage")}
           </label>
           <input
             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
@@ -101,7 +106,7 @@ const Translation: React.FC<TranslationProps> = ({
 
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Keep original text:
+            {t("translation.keepOriginalLabel")}
           </label>
           <input
             type="checkbox"
@@ -111,14 +116,14 @@ const Translation: React.FC<TranslationProps> = ({
             className={!canTranslate ? "cursor-not-allowed opacity-50" : ""}
           />
           <span className="ml-2 text-sm text-gray-600">
-            Keep original text alongside translation
+            {t("translation.keepOriginal")}
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              LLM API endpoint:
+              {t("settings.llmApiEndpoint")}:
             </label>
             <input
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
@@ -133,7 +138,7 @@ const Translation: React.FC<TranslationProps> = ({
 
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              LLM API key:
+              {t("settings.llmApiKey")}:
             </label>
             <input
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
@@ -148,7 +153,7 @@ const Translation: React.FC<TranslationProps> = ({
 
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              LLM model:
+              {t("settings.llmModel")}:
             </label>
             <input
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
@@ -180,7 +185,9 @@ const Translation: React.FC<TranslationProps> = ({
             onClick={handleTranslate}
             disabled={!canTranslate}
           >
-            {canTranslate ? "Translate SRT" : "Translate SRT (Disabled)"}
+            {canTranslate
+              ? t("translation.translate")
+              : `${t("translation.translate")} (Disabled)`}
           </button>
           <button
             className={`font-bold py-2 px-4 rounded transition-colors ${
@@ -191,14 +198,14 @@ const Translation: React.FC<TranslationProps> = ({
             onClick={handleCopyTranslation}
             disabled={!translatedResult}
           >
-            Copy output to clipboard
+            {t("translation.copyTranslation")}
           </button>
         </div>
 
         {translationProgress > 0 && (
           <div className="mt-4">
             <div className="flex justify-between text-sm text-gray-600 mb-1">
-              <span>Translation Progress</span>
+              <span>{t("translation.progress")}</span>
               <span>{translationProgress}%</span>
             </div>
             <div className="h-2 bg-gray-200 rounded">
@@ -207,19 +214,6 @@ const Translation: React.FC<TranslationProps> = ({
                 style={{ width: `${translationProgress}%` }}
               ></div>
             </div>
-          </div>
-        )}
-
-        {!canTranslate && (
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-800">
-              <strong>Translation Requirements:</strong>
-            </p>
-            <ul className="text-sm text-blue-700 mt-1 list-disc list-inside space-y-1">
-              <li>Transcription must be completed</li>
-              <li>Response format must be set to "SRT"</li>
-              <li>LLM API credentials must be configured</li>
-            </ul>
           </div>
         )}
       </div>

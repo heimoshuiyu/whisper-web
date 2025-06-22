@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { formatFileSize } from "../utils/toBlobURL";
 
 interface DownloadProgressProps {
@@ -17,6 +18,8 @@ const DownloadProgress: React.FC<DownloadProgressProps> = ({
   isVisible,
   error,
 }) => {
+  const { t } = useTranslation();
+
   if (!isVisible && !error) return null;
 
   // Show error message if there's an error
@@ -24,43 +27,31 @@ const DownloadProgress: React.FC<DownloadProgressProps> = ({
     return (
       <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-red-800">FFmpeg Error</span>
+          <span className="text-sm font-medium text-red-800">
+            {t("downloadProgress.ffmpegError")}
+          </span>
         </div>
         <div className="text-sm text-red-700 mb-2">
           {error === "SharedArrayBuffer not supported" ? (
             <div>
               <p className="mb-2">
                 <strong>
-                  SharedArrayBuffer is not supported in this environment.
+                  {t("downloadProgress.sharedArrayBufferNotSupported")}
                 </strong>
               </p>
+              <p className="mb-2">{t("downloadProgress.typicalIssue")}</p>
               <p className="mb-2">
-                This typically happens when deploying to GitHub Pages or other
-                static hosting services that don't support the required CORS
-                headers.
-              </p>
-              <p className="mb-2">
-                <strong>Solutions:</strong>
+                <strong>{t("downloadProgress.solutions")}:</strong>
               </p>
               <ul className="list-disc list-inside ml-4 space-y-1">
-                <li>
-                  Use the app locally (run{" "}
-                  <code className="bg-gray-100 px-1 rounded">npm run dev</code>)
-                </li>
-                <li>
-                  Deploy to a service that supports CORS headers (Vercel,
-                  Netlify, etc.)
-                </li>
-                <li>Use a custom domain with proper CORS configuration</li>
-                <li>
-                  Disable FFmpeg processing in settings and upload pre-converted
-                  audio files
-                </li>
+                <li>{t("downloadProgress.solution1")}</li>
+                <li>{t("downloadProgress.solution2")}</li>
+                <li>{t("downloadProgress.solution3")}</li>
+                <li>{t("downloadProgress.solution4")}</li>
               </ul>
               <p className="mt-2 text-xs">
-                <strong>Note:</strong> You can still use the app without FFmpeg
-                by uploading audio files that are already in a compatible format
-                (MP3, WAV, etc.).
+                <strong>{t("downloadProgress.note")}:</strong>{" "}
+                {t("downloadProgress.noteText")}
               </p>
             </div>
           ) : (
@@ -74,13 +65,13 @@ const DownloadProgress: React.FC<DownloadProgressProps> = ({
   const showTotal = total > 0;
   const progressText = showTotal
     ? `${formatFileSize(loaded)} / ${formatFileSize(total)} (${percentage}%)`
-    : `${formatFileSize(loaded)} downloaded (${percentage}%)`;
+    : `${formatFileSize(loaded)} ${t("downloadProgress.downloaded")} (${percentage}%)`;
 
   return (
     <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-blue-800">
-          Downloading {fileName}...
+          {t("downloadProgress.downloading", { fileName })}
         </span>
         <span className="text-sm text-blue-600">{progressText}</span>
       </div>
@@ -92,7 +83,7 @@ const DownloadProgress: React.FC<DownloadProgressProps> = ({
       </div>
       {!showTotal && (
         <div className="mt-1 text-xs text-blue-600">
-          File size unknown - showing estimated progress
+          {t("downloadProgress.fileSizeUnknown")}
         </div>
       )}
     </div>

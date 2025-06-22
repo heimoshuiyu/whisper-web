@@ -1,13 +1,17 @@
+import { useTranslation } from "react-i18next";
+
 interface FileUploadProps {
   file: File | null;
   setFile: (file: File | null) => void;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ setFile }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="mb-4">
       <label className="block text-gray-700 text-sm font-bold mb-2">
-        Select file:
+        {t("fileUpload.selectFile")}:
       </label>
       <input
         id="file_input"

@@ -9,3 +9,4 @@ export { default as DownloadProgress } from "./DownloadProgress";
 export { default as LLMPromptPreview } from "./LLMPromptPreview";
 export { default as WorkflowFlowchart } from "./WorkflowFlowchart";
 export { default as Modal } from "./Modal";
+export { default as LanguageSwitcher } from "./LanguageSwitcher";
