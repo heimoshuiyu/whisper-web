@@ -6,6 +6,7 @@ interface DownloadProgressProps {
   total: number;
   percentage: number;
   isVisible: boolean;
+  error?: string | null;
 }
 
 const DownloadProgress: React.FC<DownloadProgressProps> = ({
@@ -14,8 +15,61 @@ const DownloadProgress: React.FC<DownloadProgressProps> = ({
   total,
   percentage,
   isVisible,
+  error,
 }) => {
-  if (!isVisible) return null;
+  if (!isVisible && !error) return null;
+
+  // Show error message if there's an error
+  if (error) {
+    return (
+      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-red-800">FFmpeg Error</span>
+        </div>
+        <div className="text-sm text-red-700 mb-2">
+          {error === "SharedArrayBuffer not supported" ? (
+            <div>
+              <p className="mb-2">
+                <strong>
+                  SharedArrayBuffer is not supported in this environment.
+                </strong>
+              </p>
+              <p className="mb-2">
+                This typically happens when deploying to GitHub Pages or other
+                static hosting services that don't support the required CORS
+                headers.
+              </p>
+              <p className="mb-2">
+                <strong>Solutions:</strong>
+              </p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>
+                  Use the app locally (run{" "}
+                  <code className="bg-gray-100 px-1 rounded">npm run dev</code>)
+                </li>
+                <li>
+                  Deploy to a service that supports CORS headers (Vercel,
+                  Netlify, etc.)
+                </li>
+                <li>Use a custom domain with proper CORS configuration</li>
+                <li>
+                  Disable FFmpeg processing in settings and upload pre-converted
+                  audio files
+                </li>
+              </ul>
+              <p className="mt-2 text-xs">
+                <strong>Note:</strong> You can still use the app without FFmpeg
+                by uploading audio files that are already in a compatible format
+                (MP3, WAV, etc.).
+              </p>
+            </div>
+          ) : (
+            error
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const showTotal = total > 0;
   const progressText = showTotal

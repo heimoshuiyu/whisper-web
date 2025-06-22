@@ -16,6 +16,7 @@ export interface AppProps {
     loaded: number;
     total: number;
     percentage: number;
+    error?: string | null;
   };
   setDownloadProgress?: (progress: {
     isVisible: boolean;
@@ -23,6 +24,7 @@ export interface AppProps {
     loaded: number;
     total: number;
     percentage: number;
+    error?: string | null;
   }) => void;
 }
 
