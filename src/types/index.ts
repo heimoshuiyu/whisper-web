@@ -10,6 +10,20 @@ export interface AppProps {
   ffmpeg: FFmpeg;
   isFFmpegReady: boolean;
   setIsFFmpegReady?: (ready: boolean) => void;
+  downloadProgress: {
+    isVisible: boolean;
+    fileName: string;
+    loaded: number;
+    total: number;
+    percentage: number;
+  };
+  setDownloadProgress?: (progress: {
+    isVisible: boolean;
+    fileName: string;
+    loaded: number;
+    total: number;
+    percentage: number;
+  }) => void;
 }
 
 export interface SettingsProps {

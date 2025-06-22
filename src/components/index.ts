@@ -5,3 +5,4 @@ export { default as ResponseFormat } from "./ResponseFormat";
 export { default as ActionButtons } from "./ActionButtons";
 export { default as ProgressBar } from "./ProgressBar";
 export { default as ResultDisplay } from "./ResultDisplay";
+export { default as DownloadProgress } from "./DownloadProgress";

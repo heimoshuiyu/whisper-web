@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import { fetchFile } from "@ffmpeg/util";
 import { AppProps } from "./types";
 import { useLocalStorage } from "./hooks";
+import { toBlobURL } from "./utils/toBlobURL";
 // Components
 import {
   Settings,
@@ -12,9 +13,10 @@ import {
   ActionButtons,
   ProgressBar,
   ResultDisplay,
+  DownloadProgress,
 } from "./components";
 
-function App({ ffmpeg, isFFmpegReady }: AppProps) {
+function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
   const [result, setResult] = useState("");
   const [translatedResult, setTranslatedResult] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -149,6 +151,14 @@ function App({ ffmpeg, isFFmpegReady }: AppProps) {
         )}
       </p>
 
+      <DownloadProgress
+        fileName={downloadProgress.fileName}
+        loaded={downloadProgress.loaded}
+        total={downloadProgress.total}
+        percentage={downloadProgress.percentage}
+        isVisible={downloadProgress.isVisible}
+      />
+
       <button
         className="absolute top-0 right-0"
         onClick={() => setShowSettings(!showSettings)}
@@ -218,6 +228,13 @@ function App({ ffmpeg, isFFmpegReady }: AppProps) {
 function Root() {
   const [ffmpeg] = useState(() => new FFmpeg());
   const [isFFmpegReady, setIsFFmpegReady] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState({
+    isVisible: false,
+    fileName: "",
+    loaded: 0,
+    total: 0,
+    percentage: 0,
+  });
 
   const loadFFmpeg = async () => {
     try {
@@ -237,40 +254,131 @@ function Root() {
 
       // Load ffmpeg core - use ESM version for better Vite compatibility
       const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm";
-      await ffmpeg.load({
-        coreURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.js`,
-          "text/javascript",
-        ),
-        wasmURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.wasm`,
-          "application/wasm",
-        ),
+
+      setDownloadProgress({
+        isVisible: true,
+        fileName: "ffmpeg-core.js",
+        loaded: 0,
+        total: 0,
+        percentage: 0,
       });
 
+      const coreURL = await toBlobURL(
+        `${baseURL}/ffmpeg-core.js`,
+        "text/javascript",
+        {
+          onProgress: (progress) => {
+            setDownloadProgress((prev) => ({
+              ...prev,
+              fileName: "ffmpeg-core.js",
+              loaded: progress.loaded,
+              total: progress.total,
+              percentage: progress.percentage,
+            }));
+          },
+        },
+      );
+
+      setDownloadProgress((prev) => ({
+        ...prev,
+        fileName: "ffmpeg-core.wasm",
+        loaded: 0,
+        total: 0,
+        percentage: 0,
+      }));
+
+      const wasmURL = await toBlobURL(
+        `${baseURL}/ffmpeg-core.wasm`,
+        "application/wasm",
+        {
+          onProgress: (progress) => {
+            setDownloadProgress((prev) => ({
+              ...prev,
+              fileName: "ffmpeg-core.wasm",
+              loaded: progress.loaded,
+              total: progress.total,
+              percentage: progress.percentage,
+            }));
+          },
+        },
+      );
+
+      await ffmpeg.load({
+        coreURL,
+        wasmURL,
+      });
+
+      setDownloadProgress((prev) => ({ ...prev, isVisible: false }));
       setIsFFmpegReady(true);
       console.log("FFmpeg loaded successfully");
     } catch (error) {
       console.error("Failed to load FFmpeg:", error);
+      setDownloadProgress((prev) => ({ ...prev, isVisible: false }));
+
       // Try fallback to UMD version if ESM fails
       try {
         console.log("Trying fallback to UMD version...");
         const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd";
-        await ffmpeg.load({
-          coreURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.js`,
-            "text/javascript",
-          ),
-          wasmURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.wasm`,
-            "application/wasm",
-          ),
+
+        setDownloadProgress({
+          isVisible: true,
+          fileName: "ffmpeg-core.js (UMD)",
+          loaded: 0,
+          total: 0,
+          percentage: 0,
         });
 
+        const coreURL = await toBlobURL(
+          `${baseURL}/ffmpeg-core.js`,
+          "text/javascript",
+          {
+            onProgress: (progress) => {
+              setDownloadProgress((prev) => ({
+                ...prev,
+                fileName: "ffmpeg-core.js (UMD)",
+                loaded: progress.loaded,
+                total: progress.total,
+                percentage: progress.percentage,
+              }));
+            },
+          },
+        );
+
+        setDownloadProgress((prev) => ({
+          ...prev,
+          fileName: "ffmpeg-core.wasm (UMD)",
+          loaded: 0,
+          total: 0,
+          percentage: 0,
+        }));
+
+        const wasmURL = await toBlobURL(
+          `${baseURL}/ffmpeg-core.wasm`,
+          "application/wasm",
+          {
+            onProgress: (progress) => {
+              setDownloadProgress((prev) => ({
+                ...prev,
+                fileName: "ffmpeg-core.wasm (UMD)",
+                loaded: progress.loaded,
+                total: progress.total,
+                percentage: progress.percentage,
+              }));
+            },
+          },
+        );
+
+        await ffmpeg.load({
+          coreURL,
+          wasmURL,
+        });
+
+        setDownloadProgress((prev) => ({ ...prev, isVisible: false }));
         setIsFFmpegReady(true);
         console.log("FFmpeg loaded successfully with UMD fallback");
       } catch (fallbackError) {
         console.error("Failed to load FFmpeg with fallback:", fallbackError);
+        setDownloadProgress((prev) => ({ ...prev, isVisible: false }));
       }
     }
   };
@@ -282,7 +390,11 @@ function Root() {
   return (
     <div className="container mx-auto p-8">
       <div className="bg-white rounded shadow-lg p-6">
-        <App ffmpeg={ffmpeg} isFFmpegReady={isFFmpegReady} />
+        <App
+          ffmpeg={ffmpeg}
+          isFFmpegReady={isFFmpegReady}
+          downloadProgress={downloadProgress}
+        />
       </div>
     </div>
   );
