@@ -132,6 +132,7 @@
   },
   "footer": {
     "openSource": "This is an open-source project. View the source code on",
+    "about": "About",
     "github": "GitHub"
   }
 }

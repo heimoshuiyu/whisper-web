@@ -337,7 +337,13 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
             className="text-blue-600 hover:text-blue-800 underline"
           >
             {t("footer.github")}
-          </a>
+          </a>{" "}
+          <button
+            className="ml-2 text-blue-500 underline hover:text-blue-700"
+            onClick={() => setIsModalOpen(true)}
+          >
+            {t("footer.about")}
+          </button>
         </p>
       </div>
     </div>

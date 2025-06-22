@@ -132,6 +132,7 @@
   },
   "footer": {
     "openSource": "这是一个开源项目。",
+    "about": "关于",
     "github": "GitHub"
   }
 }
