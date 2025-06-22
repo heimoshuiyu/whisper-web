@@ -110,6 +110,7 @@
     "fileSizeUnknown": "文件大小未知 - 显示估计进度"
   },
   "modal": {
+    "title": "Whisper 后端信息",
     "whisperFastApi": {
       "title": "Whisper-FastAPI 项目",
       "description": "您可以使用开源的 whisper-fastapi 项目托管自己的 Whisper 后端。",

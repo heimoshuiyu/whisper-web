@@ -110,6 +110,7 @@
     "fileSizeUnknown": "File size unknown - showing estimated progress"
   },
   "modal": {
+    "title": "Whisper Backend Information",
     "whisperFastApi": {
       "title": "Whisper-FastAPI Project",
       "description": "You can host your own Whisper backend using the open-source whisper-fastapi project.",
