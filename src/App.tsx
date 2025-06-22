@@ -157,7 +157,7 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
         onClick={() => setShowSettings(!showSettings)}
       >
         <img
-          className="w-10 my-2 p-2 border rounded shadow bg-gray-200"
+          className="w-10 my-0 p-2 border rounded shadow bg-gray-200"
           src="settings.svg"
         />
       </button>
