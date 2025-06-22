@@ -10,6 +10,7 @@ const Settings: React.FC<SettingsProps> = ({
   setLanguage,
   useFFmpeg,
   setUseFFmpeg,
+  onOpenModal,
 }) => {
   if (!showSettings) return null;
 
@@ -17,14 +18,13 @@ const Settings: React.FC<SettingsProps> = ({
     <div className="my-4 settings">
       <span className="my-4">
         <label className="my-4 block text-gray-700 text-sm font-bold mb-2">
-          API endpoint:
-          <a
-            className="ml-2 text-blue-500 underline"
-            href="https://github.com/heimoshuiyu/whisper-fastapi/"
-            target="_blank"
+          API endpoint: This is a demo API. You can
+          <button
+            className="ml-2 text-blue-500 underline hover:text-blue-700"
+            onClick={onOpenModal}
           >
-            How to host your own whisper backend
-          </a>
+            host your own whisper backend
+          </button>
         </label>
         <input
           spellCheck={false}

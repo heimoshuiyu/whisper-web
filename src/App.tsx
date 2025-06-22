@@ -15,6 +15,7 @@ import {
   ResultDisplay,
   DownloadProgress,
   WorkflowFlowchart,
+  Modal,
 } from "./components";
 
 function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
@@ -27,6 +28,7 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
   const [keepOriginal, setKeepOriginal] = useState(true);
   const [translationProgress, setTranslationProgress] = useState(0);
   const [showWorkflow, setShowWorkflow] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Local storage hooks
   const [selectResponseFormat, setSelectResponseFormat] = useLocalStorage(
@@ -219,6 +221,7 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
         setLanguage={setLanguage}
         useFFmpeg={useFFmpeg}
         setUseFFmpeg={setUseFFmpeg}
+        onOpenModal={() => setIsModalOpen(true)}
       />
 
       <FileUpload file={file} setFile={setFile} />
@@ -257,6 +260,76 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
       />
 
       <ResultDisplay result="" translatedResult={translatedResult} />
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Whisper-FastAPI Project
+            </h3>
+            <p className="text-gray-600 mb-3">
+              You can host your own Whisper backend using the open-source
+              whisper-fastapi project.
+            </p>
+            <a
+              href="https://github.com/heimoshuiyu/whisper-fastapi/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors"
+            >
+              View Project on GitHub
+            </a>
+          </div>
+
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Contact Information
+            </h3>
+            <p className="text-gray-600 mb-3">
+              If you need more stable API service or help setting up a local API
+              backend, feel free to contact me:
+            </p>
+            <div className="space-y-2">
+              <a
+                href="mailto:heimoshuiyu@gmail.com"
+                className="block text-blue-500 hover:text-blue-700 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                📧 heimoshuiyu@gmail.com
+              </a>
+              <a
+                href="https://matrix.to/#/@heimoshuiyu:miku.social"
+                className="block text-blue-500 hover:text-blue-700 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                💬 Matrix: @heimoshuiyu:miku.social
+              </a>
+              <a
+                href="https://t.me/heimoshuiyu"
+                className="block text-blue-500 hover:text-blue-700 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                💬 Telegram: @heimoshuiyu
+              </a>
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Services Offered
+            </h3>
+            <ul className="text-gray-600 space-y-1 list-disc list-inside">
+              <li>Stable and fast API service</li>
+              <li>Help with local backend setup</li>
+              <li>Custom Whisper model deployment</li>
+              <li>Technical consultation and support</li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
 
       <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
         <p>

@@ -38,6 +38,7 @@ export interface SettingsProps {
   setLanguage: (value: string) => void;
   useFFmpeg: boolean;
   setUseFFmpeg: (value: boolean) => void;
+  onOpenModal: () => void;
 }
 
 export interface TranslationProps {

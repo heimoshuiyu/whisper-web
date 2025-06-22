@@ -8,3 +8,4 @@ export { default as ResultDisplay } from "./ResultDisplay";
 export { default as DownloadProgress } from "./DownloadProgress";
 export { default as LLMPromptPreview } from "./LLMPromptPreview";
 export { default as WorkflowFlowchart } from "./WorkflowFlowchart";
+export { default as Modal } from "./Modal";
