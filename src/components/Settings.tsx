@@ -58,7 +58,7 @@ const Settings: React.FC<SettingsProps> = ({
       </span>
       <span className="my-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
-          Use FFmpeg.js:
+          Use FFmpeg:
         </label>
         <input
           type="checkbox"

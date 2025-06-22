@@ -6,9 +6,9 @@ This is a web tool that utilizes OpenAI's Whisper API for transcribing and trans
 
 ## Key Features  
 
-- **Preprocessing with ffmpeg.js**:  
+- **Preprocessing with ffmpeg.wasm**:  
   Reduces file size by converting media to 16kHz mono audio with libopus codec (64kbps bitrate), optimizing transmission speed to the API.  
-  *(Note: ffmpeg.js may occasionally fail to process files; this feature can be disabled in settings.)*  
+  *(Note: ffmpeg.wasm may occasionally fail to process files; this feature can be disabled in settings.)*  
 - **Multiple Output Formats**:  
   Supports plain text, SRT, VTT, and JSON transcription formats.  
 - **LLM-Powered SRT Translation**:  

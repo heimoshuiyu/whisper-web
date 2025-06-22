@@ -1,3 +1,5 @@
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+
 export interface SrtChunk {
   number: string;
   time: string;
@@ -5,10 +7,9 @@ export interface SrtChunk {
 }
 
 export interface AppProps {
-  worker: any;
-  isWorkerReady: boolean;
-  setIsWorkerReady: (ready: boolean) => void;
-  ffmpeg_worker_js_path: string;
+  ffmpeg: FFmpeg;
+  isFFmpegReady: boolean;
+  setIsFFmpegReady?: (ready: boolean) => void;
 }
 
 export interface SettingsProps {

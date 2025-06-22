@@ -1,6 +1,6 @@
 interface ActionButtonsProps {
   useFFmpeg: boolean;
-  isWorkerReady: boolean;
+  isFFmpegReady: boolean;
   file: File | null;
   isRunning: boolean;
   result: string;
@@ -9,7 +9,7 @@ interface ActionButtonsProps {
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({
   useFFmpeg,
-  isWorkerReady,
+  isFFmpegReady,
   file,
   isRunning,
   result,
@@ -31,7 +31,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     <div className="mt-6 flex justify-between space-x-4">
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={useFFmpeg && (!isWorkerReady || !file || isRunning)}
+        disabled={useFFmpeg && (!isFFmpegReady || !file || isRunning)}
         onClick={onTranscribe}
       >
         Transcribe

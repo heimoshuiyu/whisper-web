@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { AppProps } from "./types";
 import { useLocalStorage } from "./hooks";
 // Components
@@ -12,12 +14,7 @@ import {
   ResultDisplay,
 } from "./components";
 
-function App({
-  worker,
-  isWorkerReady,
-  setIsWorkerReady,
-  ffmpeg_worker_js_path,
-}: AppProps) {
+function App({ ffmpeg, isFFmpegReady }: AppProps) {
   const [result, setResult] = useState("");
   const [translatedResult, setTranslatedResult] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -86,34 +83,6 @@ function App({
     setIsRunning(false);
   };
 
-  if (worker !== null) {
-    worker.onmessage = function (e: any) {
-      const msg = e.data;
-      console.log(`[${msg.type}] ${msg.data}`);
-      switch (msg.type) {
-        case "ready":
-          setIsWorkerReady(true);
-          break;
-        case "stdout":
-          setStdout(msg.data);
-          break;
-        case "stderr":
-          setStdout(msg.data);
-          break;
-        case "done":
-          console.log("done", msg);
-          if (msg.data.MEMFS.length === 0) {
-            setStdout("Error: please check F12 console");
-            setIsRunning(false);
-            break;
-          }
-
-          transcribe(msg.data.MEMFS[0].data);
-          break;
-      }
-    };
-  }
-
   const handleTranscribe = async () => {
     if (!file) {
       return;
@@ -127,17 +96,17 @@ function App({
 
     setResult("");
     console.log("file is", file);
-    let fileData = await file.arrayBuffer();
     const outputFile = file.name + ".webm";
 
-    setStdout("Compiling ffmpeg.js...");
+    setStdout("Processing with ffmpeg.wasm...");
     setIsRunning(true);
 
-    // read file data
-    worker.postMessage({
-      type: "run",
-      MEMFS: [{ name: file.name, data: fileData }],
-      arguments: [
+    try {
+      // Write the input file to ffmpeg's virtual filesystem
+      await ffmpeg.writeFile(file.name, await fetchFile(file));
+
+      // Execute ffmpeg command
+      await ffmpeg.exec([
         "-i",
         file.name,
         "-vn",
@@ -150,8 +119,20 @@ function App({
         "-b:a",
         "64k",
         outputFile,
-      ],
-    });
+      ]);
+
+      // Read the output file
+      const data = await ffmpeg.readFile(outputFile);
+
+      // Convert to transcribe
+      await transcribe(data);
+    } catch (error) {
+      console.error("FFmpeg processing error:", error);
+      setStdout(
+        "Error: FFmpeg processing failed. Please check console for details.",
+      );
+      setIsRunning(false);
+    }
   };
 
   return (
@@ -160,13 +141,11 @@ function App({
       <p className="mb-2">Transcribe your media</p>
 
       <p className="mb-4">
-        FFmpeg worker status:{" "}
-        {isWorkerReady ? (
+        FFmpeg status:{" "}
+        {isFFmpegReady ? (
           <span className="text-green-500">Ready</span>
         ) : (
-          <span className="text-red-500">
-            Loading from {ffmpeg_worker_js_path}
-          </span>
+          <span className="text-red-500">Loading ffmpeg.wasm...</span>
         )}
       </p>
 
@@ -201,7 +180,7 @@ function App({
 
       <ActionButtons
         useFFmpeg={useFFmpeg}
-        isWorkerReady={isWorkerReady}
+        isFFmpegReady={isFFmpegReady}
         file={file}
         isRunning={isRunning}
         result={result}
@@ -237,32 +216,73 @@ function App({
 }
 
 function Root() {
-  const ffmpeg_worker_js_path =
-    "https://cdn.jsdelivr.net/npm/ffmpeg.js@4.2.9003/ffmpeg-worker-webm.js";
-  const [worker, setWorker] = useState<any>(null);
-  const loadWorker = async () => {
-    const jsContent = await fetch(ffmpeg_worker_js_path).then((res) =>
-      res.text(),
-    );
-    const blob = new Blob([jsContent], { type: "application/javascript" });
-    setWorker(new Worker(window.URL.createObjectURL(blob)));
-  };
-  useEffect(() => {
-    loadWorker();
-  }, []);
-  const [isWorkerReady, setIsWorkerReady] = useState(false);
+  const [ffmpeg] = useState(() => new FFmpeg());
+  const [isFFmpegReady, setIsFFmpegReady] = useState(false);
 
-  console.log("worker created");
+  const loadFFmpeg = async () => {
+    try {
+      // Check for SharedArrayBuffer support (required for ffmpeg.wasm)
+      if (typeof SharedArrayBuffer === "undefined") {
+        console.error("SharedArrayBuffer is not supported in this browser");
+        console.error(
+          "Error: SharedArrayBuffer is not supported. Please use a modern browser or enable cross-origin isolation.",
+        );
+        return;
+      }
+
+      // Set up logging
+      ffmpeg.on("log", ({ message }) => {
+        console.log(message);
+      });
+
+      // Load ffmpeg core - use ESM version for better Vite compatibility
+      const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm";
+      await ffmpeg.load({
+        coreURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.js`,
+          "text/javascript",
+        ),
+        wasmURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.wasm`,
+          "application/wasm",
+        ),
+      });
+
+      setIsFFmpegReady(true);
+      console.log("FFmpeg loaded successfully");
+    } catch (error) {
+      console.error("Failed to load FFmpeg:", error);
+      // Try fallback to UMD version if ESM fails
+      try {
+        console.log("Trying fallback to UMD version...");
+        const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd";
+        await ffmpeg.load({
+          coreURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.js`,
+            "text/javascript",
+          ),
+          wasmURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.wasm`,
+            "application/wasm",
+          ),
+        });
+
+        setIsFFmpegReady(true);
+        console.log("FFmpeg loaded successfully with UMD fallback");
+      } catch (fallbackError) {
+        console.error("Failed to load FFmpeg with fallback:", fallbackError);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadFFmpeg();
+  }, []);
 
   return (
     <div className="container mx-auto p-8">
       <div className="bg-white rounded shadow-lg p-6">
-        <App
-          worker={worker}
-          ffmpeg_worker_js_path={ffmpeg_worker_js_path}
-          isWorkerReady={isWorkerReady}
-          setIsWorkerReady={setIsWorkerReady}
-        />
+        <App ffmpeg={ffmpeg} isFFmpegReady={isFFmpegReady} />
       </div>
     </div>
   );
