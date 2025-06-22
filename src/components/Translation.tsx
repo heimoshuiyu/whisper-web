@@ -46,6 +46,7 @@ const Translation: React.FC<TranslationProps> = ({
       alert("Please enter target language!");
       return;
     }
+    setTranslationProgress(1);
     const translated = await translateSrtParallel(
       result,
       targetLanguage,

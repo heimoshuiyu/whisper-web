@@ -204,7 +204,7 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
 
       <ProgressBar isRunning={isRunning} />
 
-      <ResultDisplay result={result} translatedResult={translatedResult} />
+      <ResultDisplay result={result} translatedResult="" />
 
       <Translation
         result={result}
@@ -225,6 +225,8 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
         setTranslationProgress={setTranslationProgress}
         isRunning={isRunning}
       />
+
+      <ResultDisplay result="" translatedResult={translatedResult} />
 
       <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
         <p>

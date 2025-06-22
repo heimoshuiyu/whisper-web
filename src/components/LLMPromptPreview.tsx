@@ -15,7 +15,7 @@ const LLMPromptPreview: React.FC<LLMPromptPreviewProps> = ({
     return null;
   }
 
-  const systemMessage = `Transcribe the following subtitle text line by line into ${targetLanguage}. Ensure that each translated line is corresponds exactly to the original line number`;
+  const systemMessage = `Transcribe the following subtitle text line by line into ${targetLanguage}. Ensure that each translated line is corresponds exactly to the original line number. Do not add any additional text or comments. Response format: <number>: <translated text> and seperate each by 2 new lines`;
 
   const userMessage = sampleText || "Sample subtitle text will appear here...";
 
