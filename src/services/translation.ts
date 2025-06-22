@@ -19,7 +19,7 @@ export const translateChunk = async (
       messages: [
         {
           role: "system",
-          content: `Transcribe the following subtitle text line by line into ${lang}. Ensure that each translated line is corresponds exactly to the original line number`,
+          content: `Transcribe the following subtitle text line by line into ${lang}. Ensure that each translated line is corresponds exactly to the original line number. Do not add any additional text or comments. Response format: <number>: <translated text> and seperate each by 2 new lines`,
         },
         {
           role: "user",
@@ -75,12 +75,13 @@ export const translateSrtParallel = async (
 
   // Merge results
   const translatedChunks = batches.flatMap((batch, i) => {
-    const translation = results.find((r) => r.index === i)!.translated;
+    let translation: String = results.find((r) => r.index === i)!.translated;
+
     return batch.map((chunk, j) => ({
       ...chunk,
       text: keep
-        ? `${chunk.text}\n${translation.split("\n\n")[j] || ""}`
-        : translation.split("\n\n")[j] || "",
+        ? `${chunk.text}\n${translation.split("\n\n")[j].replace(/^\d+: /, "") || ""}`
+        : translation.split("\n\n")[j].replace(/^d+: /, "") || "",
     }));
   });
 
