@@ -206,26 +206,39 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
 
       <ResultDisplay result={result} translatedResult={translatedResult} />
 
-      {result && selectResponseFormat === "srt" && !isRunning && (
-        <Translation
-          result={result}
-          selectResponseFormat={selectResponseFormat}
-          targetLanguage={targetLanguage}
-          setTargetLanguage={setTargetLanguage}
-          keepOriginal={keepOriginal}
-          setKeepOriginal={setKeepOriginal}
-          llmAPIEndpoint={llmAPIEndpoint}
-          setLlmAPIEndpoint={setLlmAPIEndpoint}
-          llmKey={llmKey}
-          setLlmKey={setLlmKey}
-          llmModel={llmModel}
-          setLlmModel={setLlmModel}
-          translatedResult={translatedResult}
-          setTranslatedResult={setTranslatedResult}
-          translationProgress={translationProgress}
-          setTranslationProgress={setTranslationProgress}
-        />
-      )}
+      <Translation
+        result={result}
+        selectResponseFormat={selectResponseFormat}
+        targetLanguage={targetLanguage}
+        setTargetLanguage={setTargetLanguage}
+        keepOriginal={keepOriginal}
+        setKeepOriginal={setKeepOriginal}
+        llmAPIEndpoint={llmAPIEndpoint}
+        setLlmAPIEndpoint={setLlmAPIEndpoint}
+        llmKey={llmKey}
+        setLlmKey={setLlmKey}
+        llmModel={llmModel}
+        setLlmModel={setLlmModel}
+        translatedResult={translatedResult}
+        setTranslatedResult={setTranslatedResult}
+        translationProgress={translationProgress}
+        setTranslationProgress={setTranslationProgress}
+        isRunning={isRunning}
+      />
+
+      <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
+        <p>
+          This is an open-source project. View the source code on{" "}
+          <a
+            href="https://github.com/heimoshuiyu/whisper-web/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            GitHub
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

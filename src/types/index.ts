@@ -57,4 +57,5 @@ export interface TranslationProps {
   setTranslatedResult: (value: string) => void;
   translationProgress: number;
   setTranslationProgress: (value: number) => void;
+  isRunning: boolean;
 }
