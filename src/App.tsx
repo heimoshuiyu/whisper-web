@@ -147,9 +147,7 @@ function App({ ffmpeg, isFFmpegReady, downloadProgress }: AppProps) {
         {isFFmpegReady ? (
           <span className="text-green-500">Ready</span>
         ) : downloadProgress.error === "SharedArrayBuffer not supported" ? (
-          <span className="text-red-500">
-            Not Available (SharedArrayBuffer not supported)
-          </span>
+          <span className="text-red-500">Not Available (SharedArrayBuffer not supported)</span>
         ) : (
           <span className="text-red-500">Loading ffmpeg.wasm...</span>
         )}
@@ -251,31 +249,11 @@ function Root() {
           "Error: SharedArrayBuffer is not supported. Please use a modern browser or enable cross-origin isolation.",
         );
         // Set a flag to indicate SharedArrayBuffer is not available
-        setDownloadProgress((prev) => ({
-          ...prev,
+        setDownloadProgress((prev) => ({ 
+          ...prev, 
           isVisible: false,
-          error: "SharedArrayBuffer not supported",
+          error: "SharedArrayBuffer not supported"
         }));
-
-        // Wait a bit and check again in case the service worker enables it
-        setTimeout(() => {
-          if (typeof SharedArrayBuffer !== "undefined") {
-            console.log(
-              "SharedArrayBuffer is now available, retrying FFmpeg load...",
-            );
-            setDownloadProgress((prev) => ({
-              ...prev,
-              isVisible: true,
-              error: null,
-              fileName: "Retrying FFmpeg load...",
-              loaded: 0,
-              total: 0,
-              percentage: 0,
-            }));
-            loadFFmpeg();
-          }
-        }, 3000);
-
         return;
       }
 
@@ -341,19 +319,15 @@ function Root() {
         wasmURL,
       });
 
-      setDownloadProgress((prev) => ({
-        ...prev,
-        isVisible: false,
-        error: null,
-      }));
+      setDownloadProgress((prev) => ({ ...prev, isVisible: false, error: null }));
       setIsFFmpegReady(true);
       console.log("FFmpeg loaded successfully");
     } catch (error) {
       console.error("Failed to load FFmpeg:", error);
-      setDownloadProgress((prev) => ({
-        ...prev,
+      setDownloadProgress((prev) => ({ 
+        ...prev, 
         isVisible: false,
-        error: "Failed to load FFmpeg",
+        error: "Failed to load FFmpeg"
       }));
 
       // Try fallback to UMD version if ESM fails
@@ -415,19 +389,15 @@ function Root() {
           wasmURL,
         });
 
-        setDownloadProgress((prev) => ({
-          ...prev,
-          isVisible: false,
-          error: null,
-        }));
+        setDownloadProgress((prev) => ({ ...prev, isVisible: false, error: null }));
         setIsFFmpegReady(true);
         console.log("FFmpeg loaded successfully with UMD fallback");
       } catch (fallbackError) {
         console.error("Failed to load FFmpeg with fallback:", fallbackError);
-        setDownloadProgress((prev) => ({
-          ...prev,
+        setDownloadProgress((prev) => ({ 
+          ...prev, 
           isVisible: false,
-          error: "FFmpeg failed to load",
+          error: "FFmpeg failed to load"
         }));
       }
     }
